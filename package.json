@@ -1,0 +1,47 @@
+{
+  "name": "sales-tracker-pwa",
+  "version": "1.0.0",
+  "description": "A comprehensive sales management system for jewelry business - Progressive Web App",
+  "private": true,
+  "keywords": [
+    "sales",
+    "tracking",
+    "jewelry",
+    "business",
+    "management",
+    "PWA",
+    "progressive-web-app"
+  ],
+  "license": "MIT",
+  "author": "Sales Tracker Team",
+  "homepage": "https://github.com/yourusername/sales-tracker-pwa",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/sales-tracker-pwa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/sales-tracker-pwa/issues"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve --open --config webpack.config.dev.js",
+    "build": "webpack --config webpack.config.prod.js",
+    "serve": "python -m http.server 8080",
+    "serve-node": "npx http-server -p 8080",
+    "pwa-test": "npx lighthouse http://localhost:8080 --view",
+    "deploy": "npm run build && gh-pages -d dist"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "html-webpack-plugin": "^5.6.0",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4",
+    "webpack-merge": "^5.10.0",
+    "gh-pages": "^6.1.1",
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
