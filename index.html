@@ -1,0 +1,27 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Test - Sales Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('./service-worker.js')
+            .then(function (registration) {
+              console.log('✓ Service Worker registered with scope:', registration.scope);
+            })
+            .catch(function (error) {
+              console.error('✗ Service Worker registration failed:', error);
+            });
+        });
+      }
+    </script>
+</head>
+<body>
+    <h1>PWA Test Page</h1>
+    <p>This is a simple test for PWA with service worker support.</p>
+</body>
+</html>
