@@ -160,7 +160,8 @@ function installPWA() {
             <p>Network Status: <span id="networkStatus" class="status">Checking...</span></p>
             <button class="test-btn" onclick="testServiceWorker()">Test Service Worker</button>
         </div>
-        
+         <button id="installButton" onclick="installPWA()" style="display: none; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px;">Install App</button>
+
         <div class="test-section">
             <h3>PWA Features</h3>
             <div class="feature-list">
@@ -450,7 +451,6 @@ function installPWA() {
         // Initialize
         log('🚀 PWA Test Dashboard initialized');
     </script>
-   <button id="installButton" onclick="installPWA()" style="display: none; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px;">Install App</button>
-
+  
 </body>
 </html>
