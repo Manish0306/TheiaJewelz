@@ -2,7 +2,7 @@
 {
   "name": "Sales Tracker PWA",
   "short_name": "SalesTracker",
-  "start_url": "./pwa-test.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
