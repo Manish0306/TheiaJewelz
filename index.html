@@ -1,456 +1,1143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PWA Test - Sales Tracker</title>
-    <link rel="manifest" href="manifest.json">
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/TheiaJewelz/service-worker.js')
-            .then(function (registration) {
-              console.log('✓ Service Worker registered with scope:', registration.scope);
-            })
-            .catch(function (error) {
-              console.error('✗ Service Worker registration failed:', error);
-            });
-        });
-      }
-       let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // Stop the automatic prompt
-  deferredPrompt = e;
-  document.getElementById('installButton').style.display = 'block'; // Show install button
-});
-
-function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choice => {
-      if (choice.outcome === 'accepted') {
-        console.log('User accepted the PWA install');
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-      deferredPrompt = null;
-    });
-  }
-}
-
-    </script>
-
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .test-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #3b82f6;
-        }
-        .test-section h3 {
-            color: #3b82f6;
-            margin-top: 0;
-        }
-        .status {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        .status.success {
-            background: #10b981;
-            color: white;
-        }
-        .status.error {
-            background: #ef4444;
-            color: white;
-        }
-        .status.warning {
-            background: #f59e0b;
-            color: white;
-        }
-        .test-btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background 0.2s;
-        }
-        .test-btn:hover {
-            background: #2563eb;
-        }
-        .test-results {
-            background: #000;
-            color: #00ff00;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 14px;
-            margin: 10px 0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .feature-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        .feature-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-        .feature-item h4 {
-            margin: 0 0 10px 0;
-            color: #374151;
-        }
-        .back-btn {
-            background: #6b7280;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
-        }
-        .back-btn:hover {
-            background: #4b5563;
-        }
-    </style>
+    <title>Sales Tracking Application</title>
+    <meta name="description" content="A comprehensive sales management system for jewelry business">
+    <meta name="keywords" content="sales, tracking, jewelry, business, management, PWA">
+    <meta name="author" content="Sales Tracker">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SalesTracker">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="SalesTracker">
+    <meta name="msapplication-TileColor" content="#3b82f6">
+    <meta name="msapplication-navbutton-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzIiIGhlaWdodD0iNzIiIHZpZXdCb3g9IjAgMCA3MiA3MiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjcyIiBoZWlnaHQ9IjcyIiByeD0iMTYiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik0yMC41IDE4SDE4VjIwLjVWNTEuNUMxOCA1My40MzMgMTkuNTY3IDU1IDIxLjUgNTVINTIuNUM1NC40MzMgNTUgNTYgNTMuNDMzIDU2IDUxLjVWMjAuNVYxOEg1My41SDIwLjVaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPHN0cm9rZSBkPSJNMjYgMzBIMzZIMzBWMzZWMzBaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPHN0cm9rZSBkPSJNMzAgNDBIMzZIMzBWNDBaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiLz4KPHN0cm9rZSBkPSJNMjYgNDBIMzAiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzFfMSIgeDE9IjAiIHkxPSIwIiB4Mj0iNzIiIHkyPSI3MiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vu2UiPgo8c3RvcCBzdG9wLWNvbG9yPSIjM0I4MkY2Ii8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFENEVEOCIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iNDAiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8xXzEpIi8+CjxwYXRoIGQ9Ik01NC41IDQ4SDQ4VjU0LjVWMTM3LjVDNDggMTQzLjAyOCA1Mi40NzE5IDE0NyA1OCAxNDdIMTM4QzE0My41MjggMTQ3IDE0OCAxNDMuMDI4IDE0OCAxMzcuNVY1NC41VjQ4SDE0MS41SDU0LjVaIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjYiLz4KPHN0cm9rZSBkPSJNNzIgODBIMTA4SDk2Vjk2Vjg4WiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxzdHJva2UgZD0iTTgwIDEwOEgxMDhIOTZWMTA4WiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxzdHJva2UgZD0iTTcyIDEwOEg5NiIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSI2Ii8+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9InBhaW50MF9saW5lYXJfMV8xIiB4MT0iMCIgeTE9IjAiIHgyPSIxOTIiIHkyPSIxOTIiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzNCODJGNiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxRDRFRDgiLz4KPC9saW5lYXJHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- JavaScript Libraries -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
-        <a href="./" class="back-btn">← Back to Sales Tracker</a>
+    <div id="app" class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         
-        <h1>PWA Test Dashboard</h1>
-        
-        <div class="test-section">
-            <h3>Service Worker Status</h3>
-            <p>Service Worker: <span id="swStatus" class="status">Checking...</span></p>
-            <p>Cache Status: <span id="cacheStatus" class="status">Checking...</span></p>
-            <p>Network Status: <span id="networkStatus" class="status">Checking...</span></p>
-            <button class="test-btn" onclick="testServiceWorker()">Test Service Worker</button>
-        </div>
-         <button id="installButton" onclick="installPWA()" style="display: none; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px;">Install App</button>
-
-        <div class="test-section">
-            <h3>PWA Features</h3>
-            <div class="feature-list">
-                <div class="feature-item">
-                    <h4>Manifest</h4>
-                    <p id="manifestStatus">Checking...</p>
+        <!-- PWA Install Banner -->
+        <div id="pwaInstallBanner" class="hidden fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white p-4 shadow-lg">
+            <div class="flex items-center justify-between max-w-4xl mx-auto">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white rounded-lg p-2">
+                        <i data-lucide="download" class="w-5 h-5 text-blue-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">Install Sales Tracker</h3>
+                        <p class="text-sm text-blue-100">Add to your home screen for quick access</p>
+                    </div>
                 </div>
-                <div class="feature-item">
-                    <h4>Installation</h4>
-                    <p id="installStatus">Checking...</p>
-                </div>
-                <div class="feature-item">
-                    <h4>Offline Support</h4>
-                    <p id="offlineStatus">Checking...</p>
-                </div>
-                <div class="feature-item">
-                    <h4>Push Notifications</h4>
-                    <p id="pushStatus">Checking...</p>
+                <div class="flex items-center gap-2">
+                    <button id="pwaInstallBtn" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors">
+                        Install
+                    </button>
+                    <button id="pwaInstallDismiss" class="text-white hover:text-blue-200 p-2 rounded-lg transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <div class="test-section">
-            <h3>Test Actions</h3>
-            <button class="test-btn" onclick="testInstallPrompt()">Test Install Prompt</button>
-            <button class="test-btn" onclick="testOfflineMode()">Test Offline Mode</button>
-            <button class="test-btn" onclick="testNotification()">Test Notification</button>
-            <button class="test-btn" onclick="clearCache()">Clear Cache</button>
+
+        <!-- Offline Banner -->
+        <div id="offlineBanner" class="hidden fixed top-0 left-0 right-0 z-50 bg-orange-600 text-white p-4 shadow-lg">
+            <div class="flex items-center justify-center max-w-4xl mx-auto">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white rounded-lg p-2">
+                        <i data-lucide="wifi-off" class="w-5 h-5 text-orange-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold">You're offline</h3>
+                        <p class="text-sm text-orange-100">Don't worry, you can still use the app</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="test-section">
-            <h3>Test Results</h3>
-            <div id="testResults" class="test-results"></div>
-            <button class="test-btn" onclick="clearResults()">Clear Results</button>
+
+        <!-- Navigation -->
+        <nav class="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3 group">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-2 shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 id="appTitle" class="text-xl font-bold text-gray-800 transition-colors duration-200 hover:text-blue-600">My Business</h1>
+                        <p class="text-sm text-gray-500">Sales Management System</p>
+                    </div>
+                </div>
+                <button
+                    id="editAppName"
+                    class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95"
+                    title="Edit App Name"
+                >
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="flex overflow-x-auto scrollbar-hide">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-tab" data-tab="add-sales">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add Sales</span>
+                </button>
+                <button class="nav-tab" data-tab="recent-sales">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    <span>Recent Sales</span>
+                </button>
+                <button class="nav-tab" data-tab="analytics">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-tab" data-tab="purchase-history">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                    <span>Purchase History</span>
+                </button>
+                <button class="nav-tab" data-tab="customers">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span>Customers</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="pb-6">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="p-6 space-y-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 shadow-md">
+                                <i data-lucide="bar-chart-3" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                                <p class="text-gray-600">Overview of your sales performance</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="dashboardExportExcel" class="export-btn">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                                Export Excel
+                            </button>
+                            <label class="import-btn">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                Import Excel
+                                <input type="file" accept=".xlsx,.xls" id="dashboardImportExcel" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="dashboardStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Stats will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i data-lucide="pie-chart" class="w-5 h-5 inline mr-2"></i>
+                                Sales by Category
+                            </h3>
+                            <div class="h-80">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i data-lucide="trending-up" class="w-5 h-5 inline mr-2"></i>
+                                Monthly Sales Trend
+                            </h3>
+                            <div class="h-80">
+                                <canvas id="salesTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i data-lucide="crown" class="w-5 h-5 inline mr-2"></i>
+                                Top Categories
+                            </h3>
+                            <div id="topCategories">
+                                <!-- Categories will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                <i data-lucide="clock" class="w-5 h-5 inline mr-2"></i>
+                                Recent Sales
+                            </h3>
+                            <div id="recentSales">
+                                <!-- Recent sales will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Sales Tab -->
+            <div id="add-sales" class="tab-content">
+                <div class="max-w-2xl mx-auto p-6">
+                    <div class="bg-white rounded-2xl shadow-xl p-8">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-3 shadow-md">
+                                <i data-lucide="plus" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Add New Sale</h2>
+                                <p class="text-gray-600">Record a new sales transaction</p>
+                            </div>
+                        </div>
+
+                        <form id="addSaleForm" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="relative">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i data-lucide="user" class="w-4 h-4 inline mr-2"></i>
+                                        Customer Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="customerName"
+                                        class="input-field"
+                                        placeholder="Enter customer name"
+                                        required
+                                    />
+                                    <div id="customerDropdown" class="customer-dropdown hidden"></div>
+                                    <div class="error-message" id="customerNameError"></div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i data-lucide="phone" class="w-4 h-4 inline mr-2"></i>
+                                        Phone Number *
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        id="phoneNumber"
+                                        class="input-field"
+                                        placeholder="Enter phone number"
+                                        required
+                                    />
+                                    <div class="error-message" id="phoneNumberError"></div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i data-lucide="tag" class="w-4 h-4 inline mr-2"></i>
+                                        Category *
+                                    </label>
+                                    <select
+                                            id="category"
+                                            name="category"
+                                            class="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="Sets">Sets</option>
+                                        <option value="Necklaces">Necklaces</option>
+                                        <option value="Earrings">Earrings</option>
+                                        <option value="Anklets">Anklets</option>
+                                        <option value="Bracelet">Bracelet</option>
+                                        <option value="Rings">Rings</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                    <div class="error-message" id="categoryError"></div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i data-lucide="calendar" class="w-4 h-4 inline mr-2"></i>
+                                        Sale Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="saleDate"
+                                        class="input-field"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i data-lucide="indian-rupee" class="w-4 h-4 inline mr-2"></i>
+                                        Cost Price (₹) *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        id="costPrice"
+                                        class="input-field"
+                                        placeholder="0.00"
+                                        required
+                                    />
+                                    <div class="error-message" id="costPriceError"></div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i data-lucide="indian-rupee" class="w-4 h-4 inline mr-2"></i>
+                                        Selling Price (₹) *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        id="sellingPrice"
+                                        class="input-field"
+                                        placeholder="0.00"
+                                        required
+                                    />
+                                    <div class="error-message" id="sellingPriceError"></div>
+                                </div>
+                            </div>
+
+                            <div id="profitDisplay" class="profit-display hidden">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-medium text-gray-700">Profit:</span>
+                                    <span id="profitAmount" class="text-lg font-bold"></span>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                id="addSaleBtn"
+                                class="w-full bg-gradient-to-r from-emerald-600 to-teal-700 text-white py-3 px-6 rounded-lg font-medium hover:from-emerald-700 hover:to-teal-800 transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                            >
+                                <i data-lucide="plus" class="w-5 h-5"></i>
+                                Add Sale
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Sales Tab -->
+            <div id="recent-sales" class="tab-content">
+                <div class="p-6">
+                    <div class="bg-white rounded-2xl shadow-xl">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-3 shadow-md">
+                                        <i data-lucide="history" class="w-6 h-6 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-2xl font-bold text-gray-800">Recent Sales</h2>
+                                        <p class="text-gray-600" id="salesCount">0 sales records</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button id="recentSalesExportExcel" class="export-btn">
+                                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                                        Export Excel
+                                    </button>
+                                    <label class="import-btn">
+                                        <i data-lucide="upload" class="w-4 h-4"></i>
+                                        Import Excel
+                                        <input type="file" accept=".xlsx,.xls" id="recentSalesImportExcel" class="hidden">
+                                    </label>
+                                    <button id="downloadSample" class="sample-btn">
+                                        <i data-lucide="download" class="w-4 h-4"></i>
+                                        Sample Excel
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col md:flex-row gap-4">
+                                <div class="relative flex-1">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                                    <input
+                                        type="text"
+                                        id="searchSales"
+                                        placeholder="Search by customer name, phone, or category..."
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                                    <div class="text-sm text-blue-600 font-medium">Total Sales</div>
+                                    <div id="totalSalesAmount" class="text-2xl font-bold text-blue-800">₹0</div>
+                                </div>
+                                <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                                    <div class="text-sm text-green-600 font-medium">Total Profit</div>
+                                    <div id="totalProfitAmount" class="text-2xl font-bold text-green-800">₹0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Selling</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profit</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="salesTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Sales data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                            <div id="noSalesMessage" class="text-center py-12 hidden">
+                                <i data-lucide="history" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                                <p class="text-gray-500">No sales records found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-content">
+                <div class="p-6 space-y-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-3 shadow-md">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">Analytics</h2>
+                                <p class="text-gray-600">Detailed insights into your sales performance</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="analyticsExportExcel" class="export-btn">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                                Export Excel
+                            </button>
+                            <label class="import-btn">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                Import Excel
+                                <input type="file" accept=".xlsx,.xls" id="analyticsImportExcel" class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="analyticsStats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Analytics stats will be populated by JavaScript -->
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Category Performance</h3>
+                            <div id="categoryPerformance">
+                                <!-- Category performance will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Customers</h3>
+                            <div id="topCustomers">
+                                <!-- Top customers will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purchase History Tab -->
+            <div id="purchase-history" class="tab-content">
+                <div class="p-6">
+                    <div class="bg-white rounded-2xl shadow-xl">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg p-3 shadow-md">
+                                        <i data-lucide="shopping-cart" class="w-6 h-6 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-2xl font-bold text-gray-800">Purchase History</h2>
+                                        <p class="text-gray-600" id="purchaseCount">0 purchase records</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button id="purchaseExportExcel" class="export-btn">
+                                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                                        Export Excel
+                                    </button>
+                                    <label class="import-btn">
+                                        <i data-lucide="upload" class="w-4 h-4"></i>
+                                        Import Excel
+                                        <input type="file" accept=".xlsx,.xls" id="purchaseImportExcel" class="hidden">
+                                    </label>
+                                    <button id="addPurchaseBtn" class="add-btn">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                        Add Purchase
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="upcomingAlerts" class="hidden mb-6 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <i data-lucide="bell" class="w-5 h-5 text-yellow-600"></i>
+                                    <h4 class="font-semibold text-yellow-800">Upcoming Purchase Alerts</h4>
+                                </div>
+                                <div id="alertsList" class="space-y-2">
+                                    <!-- Alerts will be populated by JavaScript -->
+                                </div>
+                            </div>
+
+                            <div class="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border border-orange-200">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-orange-600 font-medium">Total Purchase Cost</span>
+                                    <span id="totalPurchaseCost" class="text-2xl font-bold text-orange-800">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Supplier</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alert</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchaseTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Purchase data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                            <div id="noPurchasesMessage" class="text-center py-12 hidden">
+                                <i data-lucide="shopping-cart" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                                <p class="text-gray-500">No purchase records found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Tab -->
+            <div id="customers" class="tab-content">
+                <div class="p-6">
+                    <div class="bg-white rounded-2xl shadow-lg">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="bg-green-100 rounded-lg p-3">
+                                    <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-gray-800">Customers</h2>
+                                    <p class="text-gray-600" id="customerCount">0 customers</p>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col md:flex-row gap-4 mb-6">
+                                <div class="relative flex-1">
+                                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                                    <input
+                                        type="text"
+                                        id="searchCustomers"
+                                        placeholder="Search by name or phone number..."
+                                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                    />
+                                </div>
+                                <div class="flex gap-2">
+                                    <button
+                                        id="exportCustomers"
+                                        class="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center gap-2"
+                                        title="Export Customers"
+                                    >
+                                        <i data-lucide="download" class="w-4 h-4"></i>
+                                        Export
+                                    </button>
+                                    <button
+                                        id="importCustomers"
+                                        class="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 flex items-center gap-2"
+                                        title="Import Customers"
+                                    >
+                                        <i data-lucide="upload" class="w-4 h-4"></i>
+                                        Import
+                                    </button>
+                                    <button
+                                        id="deleteAllCustomers"
+                                        class="px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center gap-2"
+                                        title="Delete All Customers"
+                                    >
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        Delete All
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden input for importing customers -->
+                            <input type="file" id="customerFileInput" accept=".xlsx,.xls" class="hidden">
+                        </div>
+
+                        <div class="p-6">
+                            <div id="customersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <!-- Customers will be populated by JavaScript -->
+                            </div>
+                            <div id="noCustomersMessage" class="text-center py-12 hidden">
+                                <i data-lucide="users" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                                <p class="text-gray-500">No customers found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Add Purchase Modal -->
+        <div id="addPurchaseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Add Purchase</h3>
+                    <form id="addPurchaseForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="building" class="w-4 h-4 inline mr-2"></i>
+                                Supplier Name *
+                            </label>
+                            <input
+                                type="text"
+                                id="supplierName"
+                                class="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="phone" class="w-4 h-4 inline mr-2"></i>
+                                Supplier Phone
+                            </label>
+                            <input
+                                type="tel"
+                                id="supplierPhone"
+                                class="input-field"
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="calendar" class="w-4 h-4 inline mr-2"></i>
+                                Purchase Date *
+                            </label>
+                            <input
+                                type="date"
+                                id="purchaseDate"
+                                class="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Cost (₹) *
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                id="purchaseCost"
+                                class="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Category *
+                            </label>
+                            <input
+                                type="text"
+                                id="purchaseCategory"
+                                class="input-field"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Description
+                            </label>
+                            <textarea
+                                id="purchaseDescription"
+                                class="input-field"
+                                rows="3"
+                            ></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i data-lucide="bell" class="w-4 h-4 inline mr-2"></i>
+                                Alert Date (Optional)
+                            </label>
+                            <input
+                                type="date"
+                                id="alertDate"
+                                class="input-field"
+                            />
+                            <p class="text-xs text-gray-500 mt-1">Set a reminder date for this purchase</p>
+                        </div>
+
+                        <div class="flex gap-3 pt-4">
+                            <button
+                                type="button"
+                                id="cancelPurchase"
+                                class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
+                            >
+                                Add Purchase
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit App Name Modal -->
+        <div id="editNameModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Edit App Name</h3>
+                <input
+                    type="text"
+                    id="editAppNameInput"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 mb-4"
+                    placeholder="Enter app name"
+                />
+                <div class="flex gap-3">
+                    <button
+                        id="cancelEditName"
+                        class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        id="saveAppName"
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200"
+                    >
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Sale Modal -->
+        <div id="editSaleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">Edit Sale</h3>
+                
+                <form id="editSaleForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Customer Name *</label>
+                            <input
+                                type="text"
+                                id="editCustomerName"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Enter customer name"
+                                required
+                            />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                            <input
+                                type="tel"
+                                id="editPhoneNumber"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Enter phone number"
+                                required
+                            />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+                            <select
+                                id="editCategory"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                required
+                            >
+                                <option value="Sets">Sets</option>
+                                <option value="Necklaces">Necklaces</option>
+                                <option value="Earrings">Earrings</option>
+                                <option value="Anklets">Anklets</option>
+                                <option value="Bracelet">Bracelet</option>
+                                <option value="Rings">Rings</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Sale Date</label>
+                            <input
+                                type="date"
+                                id="editSaleDate"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Cost Price *</label>
+                            <input
+                                type="number"
+                                id="editCostPrice"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Enter cost price"
+                                min="0"
+                                step="0.01"
+                                required
+                            />
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Selling Price *</label>
+                            <input
+                                type="number"
+                                id="editSellingPrice"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                                placeholder="Enter selling price"
+                                min="0"
+                                step="0.01"
+                                required
+                            />
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                        <textarea
+                            id="editNotes"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            rows="3"
+                            placeholder="Any additional notes..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            id="cancelEditSale"
+                            class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            Update Sale
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Alert -->
+        <div id="successAlert" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-6 rounded-2xl shadow-2xl z-50 hidden min-w-[350px] max-w-[450px]">
+            <div class="flex items-center gap-4">
+                <div class="bg-emerald-400 rounded-full p-2 shadow-lg">
+                    <i data-lucide="check" class="w-5 h-5 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">Success!</div>
+                    <div id="successMessage" class="text-sm text-emerald-100">Operation completed successfully</div>
+                </div>
+                <button id="closeSuccessAlert" class="text-emerald-200 hover:text-white transition-colors p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-red-500 to-pink-600 text-white px-8 py-6 rounded-2xl shadow-2xl z-50 hidden min-w-[350px] max-w-[450px]">
+            <div class="flex items-center gap-4">
+                <div class="bg-red-400 rounded-full p-2 shadow-lg">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">Error!</div>
+                    <div id="errorMessage" class="text-sm text-red-100">Something went wrong</div>
+                </div>
+                <button id="closeErrorAlert" class="text-red-200 hover:text-white transition-colors p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Info Alert -->
+        <div id="infoAlert" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-6 rounded-2xl shadow-2xl z-50 hidden min-w-[350px] max-w-[450px]">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-400 rounded-full p-2 shadow-lg">
+                    <i data-lucide="info" class="w-5 h-5 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">Info</div>
+                    <div id="infoMessage" class="text-sm text-blue-100">Information message</div>
+                </div>
+                <button id="closeInfoAlert" class="text-blue-200 hover:text-white transition-colors p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Warning Alert -->
+        <div id="warningAlert" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-8 py-6 rounded-2xl shadow-2xl z-50 hidden min-w-[350px] max-w-[450px]">
+            <div class="flex items-center gap-4">
+                <div class="bg-amber-400 rounded-full p-2 shadow-lg">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <div class="font-bold text-lg">Warning!</div>
+                    <div id="warningMessage" class="text-sm text-amber-100">Warning message</div>
+                </div>
+                <button id="closeWarningAlert" class="text-amber-200 hover:text-white transition-colors p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
         </div>
     </div>
 
+    <script src="script.js"></script>
+    
+    <!-- PWA Script -->
     <script>
-        let testResults = document.getElementById('testResults');
+        // PWA Variables
+        let deferredPrompt;
         
-        function log(message) {
-            const timestamp = new Date().toLocaleTimeString();
-            testResults.innerHTML += `[${timestamp}] ${message}\n`;
-            testResults.scrollTop = testResults.scrollHeight;
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        
+                        // Listen for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        // New service worker is available
+                                        console.log('New service worker available');
+                                        showInfo('App has been updated! Refresh to get the latest version.');
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
         }
         
-        function updateStatus(elementId, status, text) {
-            const element = document.getElementById(elementId);
-            element.className = `status ${status}`;
-            element.textContent = text;
-        }
-        
-        // Initial checks
-        window.addEventListener('load', () => {
-            checkServiceWorker();
-            checkManifest();
-            checkInstallability();
-            checkOfflineSupport();
-            checkPushSupport();
-            checkNetworkStatus();
+        // Install prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallBanner();
         });
         
-        function checkServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistration()
-                    .then(registration => {
-                        if (registration) {
-                            updateStatus('swStatus', 'success', 'Active');
-                            log('✓ Service Worker is registered and active');
-                        } else {
-                            updateStatus('swStatus', 'error', 'Not registered');
-                            log('✗ Service Worker is not registered');
-                        }
-                    })
-                    .catch(error => {
-                        updateStatus('swStatus', 'error', 'Error');
-                        log('✗ Service Worker check failed: ' + error.message);
-                    });
-            } else {
-                updateStatus('swStatus', 'error', 'Not supported');
-                log('✗ Service Worker not supported');
-            }
-        }
-        
-        function checkManifest() {
-            fetch('./manifest.json')
-                .then(response => {
-                    if (response.ok) {
-                        updateStatus('manifestStatus', 'success', 'Available');
-                        log('✓ Manifest file is accessible');
-                        return response.json();
-                    } else {
-                        throw new Error('Manifest not found');
-                    }
-                })
-                .then(manifest => {
-                    log(`✓ Manifest loaded: ${manifest.name}`);
-                    document.getElementById('manifestStatus').textContent = `Available - ${manifest.name}`;
-                })
-                .catch(error => {
-                    updateStatus('manifestStatus', 'error', 'Not found');
-                    log('✗ Manifest check failed: ' + error.message);
-                });
-        }
-        
-        function checkInstallability() {
-            if ('serviceWorker' in navigator) {
-                updateStatus('installStatus', 'success', 'Supported');
-                log('✓ PWA installation is supported');
-            } else {
-                updateStatus('installStatus', 'error', 'Not supported');
-                log('✗ PWA installation not supported');
-            }
-        }
-        
-        function checkOfflineSupport() {
-            if ('serviceWorker' in navigator && 'caches' in window) {
-                caches.keys().then(cacheNames => {
-                    if (cacheNames.length > 0) {
-                        updateStatus('offlineStatus', 'success', 'Available');
-                        log(`✓ Offline support available (${cacheNames.length} caches)`);
-                    } else {
-                        updateStatus('offlineStatus', 'warning', 'No caches');
-                        log('⚠ No caches found');
-                    }
-                });
-            } else {
-                updateStatus('offlineStatus', 'error', 'Not supported');
-                log('✗ Offline support not available');
-            }
-        }
-        
-        function checkPushSupport() {
-            if ('Notification' in window && 'serviceWorker' in navigator) {
-                updateStatus('pushStatus', 'success', 'Supported');
-                log('✓ Push notifications supported');
-            } else {
-                updateStatus('pushStatus', 'error', 'Not supported');
-                log('✗ Push notifications not supported');
-            }
-        }
-        
-        function checkNetworkStatus() {
-            const status = navigator.onLine ? 'Online' : 'Offline';
-            const statusClass = navigator.onLine ? 'success' : 'warning';
-            updateStatus('networkStatus', statusClass, status);
-            log(`ℹ Network status: ${status}`);
-        }
-        
-        function testServiceWorker() {
-            log('🔧 Testing Service Worker...');
-            
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistration()
-                    .then(registration => {
-                        if (registration) {
-                            log('✓ Service Worker registration found');
-                            log(`  - Scope: ${registration.scope}`);
-                            log(`  - Update found: ${registration.updatefound ? 'Yes' : 'No'}`);
-                            
-                            // Test cache
-                            return caches.keys();
-                        } else {
-                            throw new Error('No registration found');
-                        }
-                    })
-                    .then(cacheNames => {
-                        log(`✓ Found ${cacheNames.length} cache(s)`);
-                        cacheNames.forEach(name => {
-                            log(`  - Cache: ${name}`);
-                        });
-                        updateStatus('cacheStatus', 'success', `${cacheNames.length} caches`);
-                    })
-                    .catch(error => {
-                        log('✗ Service Worker test failed: ' + error.message);
-                        updateStatus('cacheStatus', 'error', 'Failed');
-                    });
-            } else {
-                log('✗ Service Worker not supported');
-            }
-        }
-        
-        function testInstallPrompt() {
-            log('🔧 Testing install prompt...');
-            
-            // Simulate install prompt
-            const event = new Event('beforeinstallprompt');
-            window.dispatchEvent(event);
-            
-            log('✓ Install prompt test dispatched');
-            log('ℹ Check if install banner appears');
-        }
-        
-        function testOfflineMode() {
-            log('🔧 Testing offline mode...');
-            
-            // Simulate offline
-            const offlineEvent = new Event('offline');
-            window.dispatchEvent(offlineEvent);
-            
-            log('✓ Offline event dispatched');
-            log('ℹ Check if offline banner appears');
-            
-            // Restore online after 3 seconds
-            setTimeout(() => {
-                const onlineEvent = new Event('online');
-                window.dispatchEvent(onlineEvent);
-                log('✓ Online event dispatched');
-            }, 3000);
-        }
-        
-        function testNotification() {
-            log('🔧 Testing notifications...');
-            
-            if ('Notification' in window) {
-                if (Notification.permission === 'granted') {
-                    showTestNotification();
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            showTestNotification();
-                        } else {
-                            log('✗ Notification permission denied');
-                        }
-                    });
-                } else {
-                    log('✗ Notifications are blocked');
+        // Install banner functions
+        function showInstallBanner() {
+            const installBanner = document.getElementById('pwaInstallBanner');
+            if (installBanner) {
+                installBanner.classList.remove('hidden');
+                // Initialize icons after showing banner
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
                 }
-            } else {
-                log('✗ Notifications not supported');
             }
         }
         
-        function showTestNotification() {
-            const notification = new Notification('PWA Test', {
-                body: 'This is a test notification from Sales Tracker PWA',
-                icon: './favicon.ico',
-                badge: './favicon.ico'
-            });
-            
-            notification.onclick = () => {
-                log('✓ Test notification clicked');
-                notification.close();
-            };
-            
-            log('✓ Test notification shown');
-        }
-        
-        function clearCache() {
-            log('🔧 Clearing cache...');
-            
-            if ('caches' in window) {
-                caches.keys().then(cacheNames => {
-                    return Promise.all(
-                        cacheNames.map(cacheName => {
-                            log(`  - Deleting cache: ${cacheName}`);
-                            return caches.delete(cacheName);
-                        })
-                    );
-                }).then(() => {
-                    log('✓ All caches cleared');
-                    updateStatus('cacheStatus', 'warning', 'Cleared');
-                }).catch(error => {
-                    log('✗ Cache clearing failed: ' + error.message);
-                });
-            } else {
-                log('✗ Cache API not supported');
+        function hideInstallBanner() {
+            const installBanner = document.getElementById('pwaInstallBanner');
+            if (installBanner) {
+                installBanner.classList.add('hidden');
             }
         }
         
-        function clearResults() {
-            testResults.innerHTML = '';
-            log('🔧 Test results cleared');
+        // Online/Offline detection
+        function showOfflineBanner() {
+            const offlineBanner = document.getElementById('offlineBanner');
+            if (offlineBanner) {
+                offlineBanner.classList.remove('hidden');
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
         }
         
-        // Listen for online/offline events
+        function hideOfflineBanner() {
+            const offlineBanner = document.getElementById('offlineBanner');
+            if (offlineBanner) {
+                offlineBanner.classList.add('hidden');
+            }
+        }
+        
+        // Network status listeners
         window.addEventListener('online', () => {
-            checkNetworkStatus();
-            log('🌐 Network status changed to online');
+            hideOfflineBanner();
+            console.log('App is online');
+            if (typeof showSuccess !== 'undefined') {
+                showSuccess('Connection restored!');
+            }
         });
         
         window.addEventListener('offline', () => {
-            checkNetworkStatus();
-            log('🌐 Network status changed to offline');
+            showOfflineBanner();
+            console.log('App is offline');
+            if (typeof showWarning !== 'undefined') {
+                showWarning('You are offline. Some features may not work.');
+            }
         });
         
-        // Initialize
-        log('🚀 PWA Test Dashboard initialized');
+        // Check initial network status
+        if (!navigator.onLine) {
+            showOfflineBanner();
+        }
+        
+        // PWA Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Install button
+            const installBtn = document.getElementById('pwaInstallBtn');
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            console.log('User accepted the A2HS prompt');
+                            if (typeof showSuccess !== 'undefined') {
+                                showSuccess('App installed successfully!');
+                            }
+                        } else {
+                            console.log('User dismissed the A2HS prompt');
+                        }
+                        deferredPrompt = null;
+                        hideInstallBanner();
+                    }
+                });
+            }
+            
+            // Install dismiss button
+            const dismissBtn = document.getElementById('pwaInstallDismiss');
+            if (dismissBtn) {
+                dismissBtn.addEventListener('click', () => {
+                    hideInstallBanner();
+                    localStorage.setItem('pwaInstallDismissed', 'true');
+                });
+            }
+            
+            // Check if install was dismissed
+            if (localStorage.getItem('pwaInstallDismissed') === 'true') {
+                hideInstallBanner();
+            }
+            
+            // Handle URL parameters for shortcuts
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab && typeof switchTab !== 'undefined') {
+                switchTab(tab);
+            }
+        });
+        
+        // Listen for app installation
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App was installed');
+            hideInstallBanner();
+            localStorage.removeItem('pwaInstallDismissed');
+            if (typeof showSuccess !== 'undefined') {
+                showSuccess('Sales Tracker installed! You can now access it from your home screen.');
+            }
+        });
+        
+        // Add iOS specific handling
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent);
+        }
+        
+        function isInStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone === true;
+        }
+        
+        // Show iOS install instructions
+        if (isIOS() && !isInStandaloneMode() && !localStorage.getItem('iosInstallDismissed')) {
+            setTimeout(() => {
+                if (typeof showInfo !== 'undefined') {
+                    showInfo('To install this app on your iPhone/iPad, tap the Share button and select "Add to Home Screen".');
+                }
+                localStorage.setItem('iosInstallDismissed', 'true');
+            }, 3000);
+        }
+        
+        // Handle visibility change for PWA
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                console.log('App became visible');
+                // Refresh data when app becomes visible
+                if (typeof renderDashboard !== 'undefined') {
+                    renderDashboard();
+                }
+            }
+        });
+        
+        // Performance monitoring
+        if ('performance' in window) {
+            window.addEventListener('load', () => {
+                const loadTime = performance.now();
+                console.log(`PWA loaded in ${loadTime.toFixed(2)}ms`);
+            });
+        }
+        
+        // Add install prompt for desktop
+        if (window.matchMedia('(display-mode: browser)').matches) {
+            // Running in browser, show install prompt
+            setTimeout(() => {
+                if (deferredPrompt && !localStorage.getItem('pwaInstallDismissed')) {
+                    showInstallBanner();
+                }
+            }, 5000);
+        }
     </script>
-  
 </body>
 </html>
