@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWA Test - Sales Tracker</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .test-section h3 {
+            color: #3b82f6;
+            margin-top: 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #10b981;
+            color: white;
+        }
+        .status.error {
+            background: #ef4444;
+            color: white;
+        }
+        .status.warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .test-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.2s;
+        }
+        .test-btn:hover {
+            background: #2563eb;
+        }
+        .test-results {
+            background: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .feature-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        .feature-item h4 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+        .back-btn {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="./" class="back-btn">← Back to Sales Tracker</a>
+        
+        <h1>PWA Test Dashboard</h1>
+        
+        <div class="test-section">
+            <h3>Service Worker Status</h3>
+            <p>Service Worker: <span id="swStatus" class="status">Checking...</span></p>
+            <p>Cache Status: <span id="cacheStatus" class="status">Checking...</span></p>
+            <p>Network Status: <span id="networkStatus" class="status">Checking...</span></p>
+            <button class="test-btn" onclick="testServiceWorker()">Test Service Worker</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>PWA Features</h3>
+            <div class="feature-list">
+                <div class="feature-item">
+                    <h4>Manifest</h4>
+                    <p id="manifestStatus">Checking...</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Installation</h4>
+                    <p id="installStatus">Checking...</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Offline Support</h4>
+                    <p id="offlineStatus">Checking...</p>
+                </div>
+                <div class="feature-item">
+                    <h4>Push Notifications</h4>
+                    <p id="pushStatus">Checking...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Actions</h3>
+            <button class="test-btn" onclick="testInstallPrompt()">Test Install Prompt</button>
+            <button class="test-btn" onclick="testOfflineMode()">Test Offline Mode</button>
+            <button class="test-btn" onclick="testNotification()">Test Notification</button>
+            <button class="test-btn" onclick="clearCache()">Clear Cache</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test Results</h3>
+            <div id="testResults" class="test-results"></div>
+            <button class="test-btn" onclick="clearResults()">Clear Results</button>
+        </div>
+    </div>
+
+    <script>
+        let testResults = document.getElementById('testResults');
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.innerHTML += `[${timestamp}] ${message}\n`;
+            testResults.scrollTop = testResults.scrollHeight;
+        }
+        
+        function updateStatus(elementId, status, text) {
+            const element = document.getElementById(elementId);
+            element.className = `status ${status}`;
+            element.textContent = text;
+        }
+        
+        // Initial checks
+        window.addEventListener('load', () => {
+            checkServiceWorker();
+            checkManifest();
+            checkInstallability();
+            checkOfflineSupport();
+            checkPushSupport();
+            checkNetworkStatus();
+        });
+        
+        function checkServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration()
+                    .then(registration => {
+                        if (registration) {
+                            updateStatus('swStatus', 'success', 'Active');
+                            log('✓ Service Worker is registered and active');
+                        } else {
+                            updateStatus('swStatus', 'error', 'Not registered');
+                            log('✗ Service Worker is not registered');
+                        }
+                    })
+                    .catch(error => {
+                        updateStatus('swStatus', 'error', 'Error');
+                        log('✗ Service Worker check failed: ' + error.message);
+                    });
+            } else {
+                updateStatus('swStatus', 'error', 'Not supported');
+                log('✗ Service Worker not supported');
+            }
+        }
+        
+        function checkManifest() {
+            fetch('./manifest.json')
+                .then(response => {
+                    if (response.ok) {
+                        updateStatus('manifestStatus', 'success', 'Available');
+                        log('✓ Manifest file is accessible');
+                        return response.json();
+                    } else {
+                        throw new Error('Manifest not found');
+                    }
+                })
+                .then(manifest => {
+                    log(`✓ Manifest loaded: ${manifest.name}`);
+                    document.getElementById('manifestStatus').textContent = `Available - ${manifest.name}`;
+                })
+                .catch(error => {
+                    updateStatus('manifestStatus', 'error', 'Not found');
+                    log('✗ Manifest check failed: ' + error.message);
+                });
+        }
+        
+        function checkInstallability() {
+            if ('serviceWorker' in navigator) {
+                updateStatus('installStatus', 'success', 'Supported');
+                log('✓ PWA installation is supported');
+            } else {
+                updateStatus('installStatus', 'error', 'Not supported');
+                log('✗ PWA installation not supported');
+            }
+        }
+        
+        function checkOfflineSupport() {
+            if ('serviceWorker' in navigator && 'caches' in window) {
+                caches.keys().then(cacheNames => {
+                    if (cacheNames.length > 0) {
+                        updateStatus('offlineStatus', 'success', 'Available');
+                        log(`✓ Offline support available (${cacheNames.length} caches)`);
+                    } else {
+                        updateStatus('offlineStatus', 'warning', 'No caches');
+                        log('⚠ No caches found');
+                    }
+                });
+            } else {
+                updateStatus('offlineStatus', 'error', 'Not supported');
+                log('✗ Offline support not available');
+            }
+        }
+        
+        function checkPushSupport() {
+            if ('Notification' in window && 'serviceWorker' in navigator) {
+                updateStatus('pushStatus', 'success', 'Supported');
+                log('✓ Push notifications supported');
+            } else {
+                updateStatus('pushStatus', 'error', 'Not supported');
+                log('✗ Push notifications not supported');
+            }
+        }
+        
+        function checkNetworkStatus() {
+            const status = navigator.onLine ? 'Online' : 'Offline';
+            const statusClass = navigator.onLine ? 'success' : 'warning';
+            updateStatus('networkStatus', statusClass, status);
+            log(`ℹ Network status: ${status}`);
+        }
+        
+        function testServiceWorker() {
+            log('🔧 Testing Service Worker...');
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration()
+                    .then(registration => {
+                        if (registration) {
+                            log('✓ Service Worker registration found');
+                            log(`  - Scope: ${registration.scope}`);
+                            log(`  - Update found: ${registration.updatefound ? 'Yes' : 'No'}`);
+                            
+                            // Test cache
+                            return caches.keys();
+                        } else {
+                            throw new Error('No registration found');
+                        }
+                    })
+                    .then(cacheNames => {
+                        log(`✓ Found ${cacheNames.length} cache(s)`);
+                        cacheNames.forEach(name => {
+                            log(`  - Cache: ${name}`);
+                        });
+                        updateStatus('cacheStatus', 'success', `${cacheNames.length} caches`);
+                    })
+                    .catch(error => {
+                        log('✗ Service Worker test failed: ' + error.message);
+                        updateStatus('cacheStatus', 'error', 'Failed');
+                    });
+            } else {
+                log('✗ Service Worker not supported');
+            }
+        }
+        
+        function testInstallPrompt() {
+            log('🔧 Testing install prompt...');
+            
+            // Simulate install prompt
+            const event = new Event('beforeinstallprompt');
+            window.dispatchEvent(event);
+            
+            log('✓ Install prompt test dispatched');
+            log('ℹ Check if install banner appears');
+        }
+        
+        function testOfflineMode() {
+            log('🔧 Testing offline mode...');
+            
+            // Simulate offline
+            const offlineEvent = new Event('offline');
+            window.dispatchEvent(offlineEvent);
+            
+            log('✓ Offline event dispatched');
+            log('ℹ Check if offline banner appears');
+            
+            // Restore online after 3 seconds
+            setTimeout(() => {
+                const onlineEvent = new Event('online');
+                window.dispatchEvent(onlineEvent);
+                log('✓ Online event dispatched');
+            }, 3000);
+        }
+        
+        function testNotification() {
+            log('🔧 Testing notifications...');
+            
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    showTestNotification();
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            showTestNotification();
+                        } else {
+                            log('✗ Notification permission denied');
+                        }
+                    });
+                } else {
+                    log('✗ Notifications are blocked');
+                }
+            } else {
+                log('✗ Notifications not supported');
+            }
+        }
+        
+        function showTestNotification() {
+            const notification = new Notification('PWA Test', {
+                body: 'This is a test notification from Sales Tracker PWA',
+                icon: './favicon.ico',
+                badge: './favicon.ico'
+            });
+            
+            notification.onclick = () => {
+                log('✓ Test notification clicked');
+                notification.close();
+            };
+            
+            log('✓ Test notification shown');
+        }
+        
+        function clearCache() {
+            log('🔧 Clearing cache...');
+            
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    return Promise.all(
+                        cacheNames.map(cacheName => {
+                            log(`  - Deleting cache: ${cacheName}`);
+                            return caches.delete(cacheName);
+                        })
+                    );
+                }).then(() => {
+                    log('✓ All caches cleared');
+                    updateStatus('cacheStatus', 'warning', 'Cleared');
+                }).catch(error => {
+                    log('✗ Cache clearing failed: ' + error.message);
+                });
+            } else {
+                log('✗ Cache API not supported');
+            }
+        }
+        
+        function clearResults() {
+            testResults.innerHTML = '';
+            log('🔧 Test results cleared');
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', () => {
+            checkNetworkStatus();
+            log('🌐 Network status changed to online');
+        });
+        
+        window.addEventListener('offline', () => {
+            checkNetworkStatus();
+            log('🌐 Network status changed to offline');
+        });
+        
+        // Initialize
+        log('🚀 PWA Test Dashboard initialized');
+    </script>
+</body>
+</html>
